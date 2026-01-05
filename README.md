@@ -9,7 +9,7 @@ Git bilimingizni sinab ko'ring! Interaktiv test platformasi orqali Git komandala
 
 ## 🚀 Demo
 
-**[Test Boshlash →](https://your-username.github.io/git-master-test/)**
+**[Test Boshlash →](https://Makhmud-egp.github.io/git-master-test/)**
 
 ## ✨ Xususiyatlar
 
