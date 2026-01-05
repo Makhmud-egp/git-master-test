@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Master - Interactive Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .quiz-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .question {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .difficulty {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .easy { background: #d4edda; color: #155724; }
+        .medium { background: #fff3cd; color: #856404; }
+        .hard { background: #f8d7da; color: #721c24; }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            font-size: 1.1em;
+        }
+        
+        .option:hover {
+            transform: translateX(10px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .option.correct {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border-color: #4CAF50;
+            animation: correctAnswer 0.5s;
+        }
+        
+        .option.wrong {
+            background: linear-gradient(135deg, #F44336 0%, #E53935 100%);
+            color: white;
+            border-color: #F44336;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes correctAnswer {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .explanation {
+            background: #e8f4f8;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none;
+            animation: slideDown 0.5s;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+        
+        .explanation.show {
+            display: block;
+        }
+        
+        .explanation h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+        
+        .code-example {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        
+        .final-score {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            animation: zoomIn 0.5s;
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .final-score h2 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+        
+        .score-text {
+            color: white;
+            font-size: 4em;
+            font-weight: bold;
+        }
+        
+        .achievement {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .quiz-card {
+                padding: 20px;
+            }
+            
+            .question {
+                font-size: 1.2em;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Git Master - Test</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="current-q">1</div>
+                <div class="stat-label">Savol</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="correct-count">0</div>
+                <div class="stat-label">To'g'ri</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="score">0</div>
+                <div class="stat-label">Ball</div>
+            </div>
+        </div>
+        
+        <div id="quiz-container"></div>
+    </div>
+    
+    <script>
+        const questions = [
+            {
+                question: "Git'da yangi repository yaratish uchun qaysi komanda ishlatiladi?",
+                options: ["git start", "git init", "git create", "git new"],
+                correct: 1,
+                difficulty: "easy",
+                explanation: "git init - bu Git repository'ni initialize qilish uchun ishlatiladi. Bu komanda .git folder yaratadi va Git tracking boshlaydi.",
+                code: "mkdir my-project\ncd my-project\ngit init"
+            },
+            {
+                question: "Fayllarni staging area'ga qo'shish uchun qaysi komanda kerak?",
+                options: ["git commit", "git add", "git stage", "git push"],
+                correct: 1,
+                difficulty: "easy",
+                explanation: "git add - fayllarni staging area (Index) ga qo'shadi. Commit qilishdan oldin fayllar staging area'da bo'lishi kerak.",
+                code: "git add file.txt\ngit add .  # Barcha fayllar"
+            },
+            {
+                question: "git reset --soft va --mixed orasidagi asosiy farq nima?",
+                options: [
+                    "--soft Index'ni saqlab qoladi, --mixed Index'ni tozalaydi",
+                    "--soft tezroq ishlaydi",
+                    "--mixed xavfliroq",
+                    "Farq yo'q"
+                ],
+                correct: 0,
+                difficulty: "medium",
+                explanation: "--soft faqat HEAD'ni siljitadi (Index saqlanadi), --mixed esa HEAD + Index'ni tozalaydi (Working Directory saqlanadi).",
+                code: "git reset --soft HEAD~1  # Index'da qoladi\ngit reset --mixed HEAD~1  # Working Directory'da qoladi"
+            },
+            {
+                question: "Cherry-pick nima uchun ishlatiladi?",
+                options: [
+                    "Branch'ni o'chirish uchun",
+                    "Bitta commit'ni boshqa branch'ga nusxalash uchun",
+                    "Merge qilish uchun",
+                    "Tag yaratish uchun"
+                ],
+                correct: 1,
+                difficulty: "medium",
+                explanation: "Cherry-pick - bu boshqa branch'dan faqat BITTA commit'ni olib, hozirgi branch'ga nusxalash. Hotfix'lar uchun juda foydali.",
+                code: "git cherry-pick abc123\n# abc123 commit hozirgi branch'ga nusxalanadi"
+            },
+            {
+                question: "Stash nima vazifani bajaradi?",
+                options: [
+                    "Commitlarni o'chiradi",
+                    "O'zgarishlarni vaqtincha yashiradi",
+                    "Branch yaratadi",
+                    "Remote'ga push qiladi"
+                ],
+                correct: 1,
+                difficulty: "easy",
+                explanation: "Stash - o'zgarishlarni vaqtincha saqlash uchun. Urgent bug fix qilish kerak bo'lganda, hozirgi o'zgarishlarni stash qilib, keyin qaytarib olishingiz mumkin.",
+                code: "git stash save 'WIP: feature'\n# ... bug fix ...\ngit stash pop  # O'zgarishlarni qaytarish"
+            },
+            {
+                question: "git reset --hard xavfli deb hisoblanishining sababi nima?",
+                options: [
+                    "Juda sekin ishlaydi",
+                    "Barcha o'zgarishlarni qaytarib bo'lmaydigan tarzda o'chiradi",
+                    "Faqat Linux'da ishlaydi",
+                    "Remote'ni buzadi"
+                ],
+                correct: 1,
+                difficulty: "medium",
+                explanation: "--hard barcha o'zgarishlarni (Working Directory, Index, HEAD) butunlay o'chiradi va qaytarib bo'lmaydi. Ehtiyot bilan ishlatish kerak!",
+                code: "git reset --hard HEAD~1\n# ⚠️ XAVFLI! Barcha o'zgarishlar yo'qoladi!"
+            },
+            {
+                question: "Annotated tag va lightweight tag orasidagi farq nima?",
+                options: [
+                    "Annotated tag'da author, date, message bor",
+                    "Lightweight tag tezroq",
+                    "Farq yo'q",
+                    "Annotated tag faqat production uchun"
+                ],
+                correct: 0,
+                difficulty: "hard",
+                explanation: "Annotated tag - to'liq Git object (author, date, message, GPG signature). Lightweight tag - oddiy pointer. Production uchun annotated tag tavsiya etiladi.",
+                code: "git tag v1.0  # Lightweight\ngit tag -a v1.0 -m 'Release 1.0'  # Annotated"
+            },
+            {
+                question: "Git Flow'da hotfix branch qayerdan ajralib chiqadi?",
+                options: ["develop", "master", "feature", "release"],
+                correct: 1,
+                difficulty: "medium",
+                explanation: "Hotfix branch master'dan ajraladi (chunki production'dagi bug), keyin master va develop'ga merge qilinadi.",
+                code: "git checkout -b hotfix/bug master\n# ... fix bug ...\ngit checkout master\ngit merge hotfix/bug"
+            },
+            {
+                question: "Quyidagilardan qaysi biri Git'da MUMKIN EMAS?",
+                options: [
+                    "Commit'ni o'chirish",
+                    "Commit tarixini o'zgartirish",
+                    "Remote'ga force push qilish",
+                    "Hech qachon qaytarib bo'lmaydigan xatoliklar qilish"
+                ],
+                correct: 3,
+                difficulty: "hard",
+                explanation: "Git'da deyarli hamma narsa qaytarib bo'ladi (git reflog orqali). Faqat git reset --hard va git clean singari operatsiyalarda ehtiyot bo'lish kerak.",
+                code: "git reflog  # Barcha HEAD o'zgarishlari\ngit reset --hard abc123  # Qaytarish"
+            },
+            {
+                question: "git pull --rebase nima qiladi?",
+                options: [
+                    "Remote'dan fetch + merge",
+                    "Remote'dan fetch + rebase",
+                    "Local'ni o'chiradi",
+                    "Branch yaratadi"
+                ],
+                correct: 1,
+                difficulty: "hard",
+                explanation: "git pull --rebase - remote'dan fetch qilib, local commit'larni remote commit'lar ustiga rebase qiladi. Bu linear tarix yaratadi.",
+                code: "git pull --rebase origin master\n# = git fetch + git rebase origin/master"
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        let score = 0;
+        let selectedOption = null;
+        
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quiz-container');
+            
+            let html = `
+                <div class="quiz-card">
+                    <span class="difficulty ${q.difficulty}">${getDifficultyText(q.difficulty)}</span>
+                    <div class="question">${currentQuestion + 1}. ${q.question}</div>
+                    <div class="options">
+            `;
+            
+            q.options.forEach((option, index) => {
+                html += `<div class="option" onclick="selectOption(${index})" id="option-${index}">${option}</div>`;
+            });
+            
+            html += `
+                    </div>
+                    <div class="explanation" id="explanation">
+                        <h3>Tushuntirish:</h3>
+                        <p>${q.explanation}</p>
+                        <div class="code-example">${q.code}</div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-primary" onclick="checkAnswer()" id="check-btn">Tekshirish</button>
+                        <button class="btn-secondary" onclick="nextQuestion()" id="next-btn" disabled>Keyingi Savol</button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            updateStats();
+        }
+        
+        function getDifficultyText(difficulty) {
+            const map = {
+                'easy': 'Oson 😊',
+                'medium': "O'rtacha 🤔",
+                'hard': 'Qiyin 🔥'
+            };
+            return map[difficulty] || difficulty;
+        }
+        
+        function selectOption(index) {
+            if (document.getElementById('check-btn').disabled) return;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            document.getElementById(`option-${index}`).classList.add('selected');
+            selectedOption = index;
+        }
+        
+        function checkAnswer() {
+            if (selectedOption === null) {
+                alert('Iltimos, javob tanlang!');
+                return;
+            }
+            
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            if (selectedOption === q.correct) {
+                options[selectedOption].classList.add('correct');
+                correctAnswers++;
+                score += q.difficulty === 'easy' ? 10 : q.difficulty === 'medium' ? 15 : 20;
+            } else {
+                options[selectedOption].classList.add('wrong');
+                options[q.correct].classList.add('correct');
+            }
+            
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('check-btn').disabled = true;
+            document.getElementById('next-btn').disabled = false;
+            
+            updateStats();
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            selectedOption = null;
+            
+            if (currentQuestion < questions.length) {
+                renderQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            document.getElementById('correct-count').textContent = correctAnswers;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function showFinalScore() {
+            const percentage = (correctAnswers / questions.length) * 100;
+            let achievement = '';
+            let emoji = '';
+            
+            if (percentage === 100) {
+                achievement = 'GIT MASTER! 🏆';
+                emoji = '🎉';
+            } else if (percentage >= 80) {
+                achievement = 'Git Expert! 🌟';
+                emoji = '👏';
+            } else if (percentage >= 60) {
+                achievement = 'Git Professional! ✨';
+                emoji = '👍';
+            } else if (percentage >= 40) {
+                achievement = 'Git Intermediate! 📚';
+                emoji = '💪';
+            } else {
+                achievement = 'Git Beginner! 🌱';
+                emoji = '📖';
+            }
+            
+            document.getElementById('quiz-container').innerHTML = `
+                <div class="final-score">
+                    <h2>Test Yakunlandi! ${emoji}</h2>
+                    <div class="score-circle">
+                        <div class="score-text">${Math.round(percentage)}%</div>
+                    </div>
+                    <div class="achievement">${achievement}</div>
+                    <p style="font-size: 1.3em; margin: 20px 0;">
+                        ${correctAnswers} / ${questions.length} to'g'ri javob<br>
+                        Jami ball: ${score}
+                    </p>
+                    <div class="button-group">
+                        <button class="btn-success" onclick="location.reload()">Qaytadan Boshlash</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Start quiz
+        renderQuestion();
+    </script>
+</body>
+</html>
